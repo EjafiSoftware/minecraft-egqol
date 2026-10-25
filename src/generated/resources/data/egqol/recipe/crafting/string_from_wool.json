@@ -1,0 +1,16 @@
+{
+  "type": "egqol:tool_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "tag": "minecraft:wool"
+    },
+    {
+      "tag": "c:tools/shear"
+    }
+  ],
+  "result": {
+    "count": 4,
+    "id": "minecraft:string"
+  }
+}
