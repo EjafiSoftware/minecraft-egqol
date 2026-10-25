@@ -1,6 +1,7 @@
 package com.ejafi.egqol.toolcrafting;
 
 import com.mojang.serialization.MapCodec;
+import java.util.List;
 import java.util.function.Function;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
@@ -15,9 +16,8 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 
 public final class ToolShapelessRecipe extends ShapelessRecipe {
-    ToolShapelessRecipe(
-            String group, CraftingBookCategory category, ItemStack result, NonNullList<Ingredient> ingredients) {
-        super(group, category, result, ingredients);
+    ToolShapelessRecipe(String group, CraftingBookCategory category, ItemStack result, List<Ingredient> ingredients) {
+        super(group, category, result, NonNullList.of(Ingredient.EMPTY, ingredients.toArray(Ingredient[]::new)));
     }
 
     public static ToolShapelessRecipe copyOf(ShapelessRecipe recipe) {
@@ -35,12 +35,10 @@ public final class ToolShapelessRecipe extends ShapelessRecipe {
 
     @Override
     public NonNullList<ItemStack> getRemainingItems(CraftingInput input) {
-        NonNullList<ItemStack> remainders = NonNullList.withSize(input.size(), ItemStack.EMPTY);
-        for (int slot = 0; slot < input.size(); slot++) {
-            remainders.set(slot, computeRemainder(input.getItem(slot)));
-        }
-
-        return remainders;
+        ItemStack[] remainders = input.items().stream()
+                .map(ToolShapelessRecipe::computeRemainder)
+                .toArray(ItemStack[]::new);
+        return NonNullList.of(ItemStack.EMPTY, remainders);
     }
 
     private static ItemStack computeRemainder(ItemStack ingredient) {
@@ -63,19 +61,19 @@ public final class ToolShapelessRecipe extends ShapelessRecipe {
     }
 
     static final class Serializer implements RecipeSerializer<ToolShapelessRecipe> {
-        private final MapCodec<ToolShapelessRecipe> codec =
+        private static final MapCodec<ToolShapelessRecipe> MAP_CODEC =
                 RecipeSerializer.SHAPELESS_RECIPE.codec().xmap(ToolShapelessRecipe::copyOf, Function.identity());
-        private final StreamCodec<RegistryFriendlyByteBuf, ToolShapelessRecipe> streamCodec =
+        private static final StreamCodec<RegistryFriendlyByteBuf, ToolShapelessRecipe> STREAM_CODEC =
                 RecipeSerializer.SHAPELESS_RECIPE.streamCodec().map(ToolShapelessRecipe::copyOf, Function.identity());
 
         @Override
         public MapCodec<ToolShapelessRecipe> codec() {
-            return codec;
+            return MAP_CODEC;
         }
 
         @Override
         public StreamCodec<RegistryFriendlyByteBuf, ToolShapelessRecipe> streamCodec() {
-            return streamCodec;
+            return STREAM_CODEC;
         }
     }
 }

@@ -2,7 +2,6 @@ package com.ejafi.egqol.toolcrafting;
 
 import java.util.List;
 import net.datafaker.Faker;
-import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -22,7 +21,10 @@ final class ToolShapelessRecipeFaker {
     }
 
     ToolShapelessRecipe generate() {
-        Ingredient[] ingredients = ingredientStacks.stream().map(Ingredient::of).toArray(Ingredient[]::new);
-        return new ToolShapelessRecipe(group, category, result, NonNullList.of(Ingredient.EMPTY, ingredients));
+        return new ToolShapelessRecipe(
+                group,
+                category,
+                result,
+                ingredientStacks.stream().map(Ingredient::of).toList());
     }
 }
